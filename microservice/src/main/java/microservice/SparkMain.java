@@ -48,11 +48,19 @@ public class SparkMain   {
 	            PreparedStatement pstmt = conn.prepareStatement(sql);  
 	            pstmt.setString(1, topic);   
 	            ResultSet res =  pstmt.executeQuery();
+	            	
+	           
+	            
+	            if(!res.isBeforeFirst()) {
+	            	 resultStr = "Not Found";
+	            	 return res;
+	            }
+	            resultStr = "";
 	            return res;
 	        } catch (SQLException e) {  
 	            System.out.println(e.getMessage());  
 	        }
-	        System.out.println("Not Found");
+	        resultStr = "Not Found";
 			return null;  
 	    } 
 	 
@@ -64,12 +72,22 @@ public class SparkMain   {
 	            PreparedStatement pstmt = conn.prepareStatement(sql);  
 	            pstmt.setInt(1, id);  
 	            ResultSet res =  pstmt.executeQuery();
+	          
+	           
+	            
+	            if(!res.isBeforeFirst()) {
+	            	 resultStr = "Not Found";
+	            	 return res;
+	            }else {
+	            resultStr = "";
+	           
 	            return res;
+	            }
 	        } catch (SQLException e) {  
 	        
 	            System.out.println(e.getMessage());  
 	        }
-	    	System.out.println("Not Found");
+	        resultStr = "Not Found";
 			return null;  
 	    } 
 	 
@@ -93,23 +111,25 @@ public class SparkMain   {
 	 	            pstmt2.setInt(2, id);  
 	 	              pstmt2.executeUpdate();
 	 	             res =  pstmt.executeQuery();
+	 	            resultStr = "Remaining";
 	 	            return  res;
 	            }else  if(!res.next() ) {
-	            	System.out.println("Not Found");
+	            	resultStr = "Not Found";
+	            	return res;
 	            }else{
-	            	System.out.println("Sold Out");
+	            	System.out.println("Sold out");
+	            	resultStr = "Sold Out";
+	            	return res;
 	            }
-	         
-	            return res;
 	        } catch (SQLException e) {  
 	        	
 	            System.out.println(e.getMessage());  
 	        }
-	        System.out.print("Not Found");
+	        resultStr = "Not Found";
 			return null;  
 	    } 
 	 
-	 
+	 public static String resultStr = "";
 	 
 	 public static JSONArray convert(ResultSet resultSet) throws Exception {
 		 
@@ -122,9 +142,16 @@ public class SparkMain   {
 		 
 		        for (int i = 0; i < columns; i++)
 		            obj.put(resultSet.getMetaData().getColumnLabel(i + 1).toLowerCase(), resultSet.getObject(i + 1));
-		 
+		     
+		        
 		        jsonArray.put(obj);
+		       System.out.println(jsonArray);
 		    }
+		    if(!resultStr.equals("")) {
+	        	jsonArray.put(resultStr);
+	        	
+		        
+	        }
 		    return jsonArray;
 		}
 	public static void main(String[] args) {
@@ -135,18 +162,18 @@ public class SparkMain   {
 		 
 
 
-		 port(8089);
+		 port(8099);
 		 
 		 get("/search/:topic", (req, res) -> {
 			 res.type("application/json");
 			   
-			 return app.convert(app.search(req.params(":topic")));
+			 return  app.convert(app.search(req.params(":topic")));
 		 });
 		 
 		 get("/info/:id", (req, res) -> {
 			 res.type("application/json");
 			   
-			 return app.convert(app.info(Integer.parseInt(req.params(":id"))));
+			 return  app.convert(app.info(Integer.parseInt(req.params(":id"))));
 		 });
 		 
 		 
@@ -154,7 +181,7 @@ public class SparkMain   {
 			
 			 res.type("application/json");
 			 
-			 return app.convert(app.purchase(Integer.parseInt(req.params(":id"))));
+			 return ( app.convert(app.purchase(Integer.parseInt(req.params(":id"))))) ;
 		 });
 
 
