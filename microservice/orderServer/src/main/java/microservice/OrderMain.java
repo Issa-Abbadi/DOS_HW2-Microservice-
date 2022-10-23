@@ -13,10 +13,16 @@ import spark.Response;
 
 import static spark.Spark.port;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;  
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.DriverManager;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,13 +49,13 @@ public class OrderMain   {
 
 	 
 	 
-	 
+	 Connection conn = this.connect();
 	 public ResultSet purchase(int id) throws NumberFormatException, JSONException, Exception {  
 		 String sql = "SELECT quantity FROM  products WHERE id = ?";   
 		 
 	   
 	        try{  
-	            Connection conn = this.connect();  
+	              
 	            PreparedStatement pstmt = conn.prepareStatement(sql);  
 	            pstmt.setInt(1, id);  
 	            ResultSet res =  pstmt.executeQuery();
@@ -83,6 +89,7 @@ public class OrderMain   {
 	 public static String resultStr = "";
 	 
 	 public static JSONArray convert(ResultSet resultSet) throws Exception {
+
 		 
 		    JSONArray jsonArray = new JSONArray();
 		 
@@ -105,7 +112,23 @@ public class OrderMain   {
 	        }
 		    return jsonArray;
 		}
-	public static void main(String[] args) {
+	
+	 
+	 
+	 public  void orderUpdate(int id) throws NumberFormatException, JSONException, Exception {  
+		 String sql = "INSERT INTO orders(id, Time) VALUES(?,?)";   
+		 PreparedStatement pstmt= conn.prepareStatement(sql);  
+    	 pstmt.setInt(1, id);
+    	 Timestamp p = new java.sql.Timestamp(new java.util.Date().getTime());
+    	 System.out.println(p.toString());
+    	 pstmt.setString(2,p.toString());
+         pstmt.executeUpdate();
+      
+	   
+	 }
+	 
+	 
+	 public static void main(String[] args) {
 		
 		 OrderMain app = new OrderMain();
 		
@@ -118,11 +141,65 @@ public class OrderMain   {
 
 		 
 		 
-		 put("/purchase/:id", (req,res) -> {
+		 post("/purchase/:id", (req,res) -> {
 			
 			 res.type("application/json");
 			 
-			 return app.convert(app.purchase(Integer.parseInt(req.params(":id"))));
+			  URL url = new URL("http://localhost:8077/purchase/" + req.params(":id").replaceAll(" ", "%20"));
+
+			 HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			 con.setRequestMethod("GET");
+			 
+			 int status = con.getResponseCode();
+			 BufferedReader in = new BufferedReader(
+			 new InputStreamReader(con.getInputStream()));
+			 String inputLine;
+			 StringBuffer content = new StringBuffer();
+			 while ((inputLine = in.readLine()) != null) {
+		     content.append(inputLine);
+			 }
+			 in.close();
+			 System.out.println(content);
+			 
+			 if(content.toString().equals("-1")) {
+				 return new Gson().toJson("Not Found");
+			
+			 }else if (content.toString().equals("0")) {
+				 return new Gson().toJson("Sold Out");
+			 }else {
+				
+				 URL url2 = new URL("http://localhost:8077/purchase/" + req.params(":id").replaceAll(" ", "%20"));
+					
+				 con = (HttpURLConnection) url2.openConnection();
+				 con.setDoOutput(true);
+				 con.setRequestMethod("PUT");
+				 
+				
+				 
+				 OutputStreamWriter out = new OutputStreamWriter(
+						    con.getOutputStream());
+				        int w = Integer.parseInt(content.toString());
+				 
+						out.write("" + (w-1));
+						out.close();
+						
+				 BufferedReader in2 = new BufferedReader(
+						  new InputStreamReader(con.getInputStream()));
+						String inputLine2;
+						StringBuffer content2 = new StringBuffer();
+						while ((inputLine2 = in2.readLine()) != null) {
+						    content2.append(inputLine2);
+						}
+						in2.close();
+						System.out.println(content2);
+						app.orderUpdate(Integer.parseInt(req.params(":id")));
+						 return content2;
+			 }
+			 
+		
+			 
+			 
+			
 		 });
 
 

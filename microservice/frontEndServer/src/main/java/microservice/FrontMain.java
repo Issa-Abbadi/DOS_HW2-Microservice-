@@ -99,7 +99,7 @@ public class FrontMain   {
 		 });
 		 
 		 
-		 put("/purchase/:id", (req,res) -> {
+		 post("/purchase/:id", (req,res) -> {
 			
 			 res.type("application/json");
 			 
@@ -107,7 +107,7 @@ public class FrontMain   {
 			  URL url = new URL("http://localhost:8088/purchase/" + req.params(":id").replaceAll(" ", "%20"));
 			
 				 HttpURLConnection con = (HttpURLConnection) url.openConnection();
-				 con.setRequestMethod("PUT");
+				 con.setRequestMethod("POST");
 				 
 				 int status = con.getResponseCode();
 				 BufferedReader in = new BufferedReader(
@@ -120,21 +120,7 @@ public class FrontMain   {
 				 in.close();
 				 System.out.println(content);
 						
-//						 URL url2 = new URL("http://localhost:8088/purchase/" + req.params(":id").replaceAll(" ", "%20"));
-//							
-//						 HttpURLConnection con2 = (HttpURLConnection) url2.openConnection();
-//						 con2.setRequestMethod("PUT");
-//						 
-//						 int status2 = con2.getResponseCode();
-//						 BufferedReader in2 = new BufferedReader(
-//								  new InputStreamReader(con2.getInputStream()));
-//								String inputLine2;
-//								StringBuffer content2 = new StringBuffer();
-//								while ((inputLine2 = in2.readLine()) != null) {
-//								    content2.append(inputLine2);
-//								}
-//								in2.close();
-//								System.out.println(content2);
+
 				   
 				 return  content;
 		 });
