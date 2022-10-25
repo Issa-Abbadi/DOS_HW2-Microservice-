@@ -127,6 +127,7 @@ public class OrderMain   {
 	   
 	 }
 	 
+	 public static String catalogIP_Port = "192.168.1.107:8077";
 	 
 	 public static void main(String[] args) {
 		
@@ -134,7 +135,7 @@ public class OrderMain   {
 		
 		 
 		 
-
+		 
 
 		 port(8088);
 		 
@@ -145,7 +146,7 @@ public class OrderMain   {
 			
 			 res.type("application/json");
 			 
-			  URL url = new URL("http://localhost:8077/purchase/" + req.params(":id").replaceAll(" ", "%20"));
+			  URL url = new URL("http://"+catalogIP_Port+"/purchase/" + req.params(":id").replaceAll(" ", "%20"));
 
 			 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			 con.setRequestMethod("GET");
@@ -168,7 +169,7 @@ public class OrderMain   {
 				 return new Gson().toJson("Sold Out");
 			 }else {
 				
-				 URL url2 = new URL("http://localhost:8077/purchase/" + req.params(":id").replaceAll(" ", "%20"));
+				 URL url2 = new URL("http://"+catalogIP_Port+"/purchase/" + req.params(":id").replaceAll(" ", "%20"));
 					
 				 con = (HttpURLConnection) url2.openConnection();
 				 con.setDoOutput(true);

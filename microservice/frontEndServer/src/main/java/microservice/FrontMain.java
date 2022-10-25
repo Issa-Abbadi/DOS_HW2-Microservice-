@@ -31,20 +31,9 @@ import org.json.JSONObject;
 public class FrontMain   {
 	
 	
-	 private  Connection connect() {  
-	        // SQLite connection string  
-		 String url = "jdbc:sqlite:microservicedb";  
-	        Connection conn = null;  
-	        try {  
-	            conn = DriverManager.getConnection(url); 
-	            System.out.printf("COnnect Success");
-	        } catch (SQLException e) {  
-	            System.out.println(e.getMessage());  
-	        }  
-	        return conn;  
-	    }  
-	 
-  
+
+    public static String catalogIP_Port = "192.168.1.107:8077";
+    public static String orderIP_Port = "192.168.1.248:8088";
 
 	public static void main(String[] args) {
 		
@@ -58,7 +47,7 @@ public class FrontMain   {
 		 
 		 get("/search/:topic", (req, res) -> {
 			 res.type("application/json");
-		     URL url = new URL("http://localhost:8077/search/"+req.params(":topic").replaceAll(" ", "%20"));
+		     URL url = new URL("http://"+ catalogIP_Port +"/search/"+req.params(":topic").replaceAll(" ", "%20"));
 			 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			 con.setRequestMethod("GET");
 			 
@@ -79,7 +68,7 @@ public class FrontMain   {
 		 get("/info/:id", (req, res) -> {
 			 res.type("application/json");
 			   
-			  URL url = new URL("http://localhost:8077/info/" + req.params(":id").replaceAll(" ", "%20"));
+			  URL url = new URL("http://"+ catalogIP_Port +"/info/" + req.params(":id").replaceAll(" ", "%20"));
 			
 				 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 				 con.setRequestMethod("GET");
@@ -104,7 +93,7 @@ public class FrontMain   {
 			 res.type("application/json");
 			 
 			   
-			  URL url = new URL("http://localhost:8088/purchase/" + req.params(":id").replaceAll(" ", "%20"));
+			  URL url = new URL("http://"+orderIP_Port+"/purchase/" + req.params(":id").replaceAll(" ", "%20"));
 			
 				 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 				 con.setRequestMethod("POST");
