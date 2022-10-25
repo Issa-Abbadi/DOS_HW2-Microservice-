@@ -1,18 +1,7 @@
 package microservice;
-import static spark.Spark.get;
-
 import static spark.Spark.post;
-import static spark.Spark.put;
-import static spark.Spark.delete;
-
-import java.util.List;
-
 import com.google.gson.Gson;
-
-import spark.Response;
-
 import static spark.Spark.port;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -31,9 +20,9 @@ import org.json.JSONObject;
 
 public class OrderMain   {
 	
-	
+	//Connect to sqlite order database
 	 private  Connection connect() {  
-	        // SQLite connection string  
+		// SQLite connection string to the order database 
 		 String url = "jdbc:sqlite:orderdb";  
 	        Connection conn = null;  
 	        try {  
@@ -45,49 +34,15 @@ public class OrderMain   {
 	        return conn;  
 	    }  
 	 
-  
 
+	 Connection conn = this.connect(); // create just one connection to the database
+	 
+	
+	 
+	 public static String resultStr = "";//contain the message if there is to respond to user
 	 
 	 
-	 Connection conn = this.connect();
-	 public ResultSet purchase(int id) throws NumberFormatException, JSONException, Exception {  
-		 String sql = "SELECT quantity FROM  products WHERE id = ?";   
-		 
-	   
-	        try{  
-	              
-	            PreparedStatement pstmt = conn.prepareStatement(sql);  
-	            pstmt.setInt(1, id);  
-	            ResultSet res =  pstmt.executeQuery();
-	          
-	            if(res.getInt(1) > 0) {
-	            
-	            	 String sql2 = "UPDATE products SET quantity = ? WHERE id = ?"; 
-	            	 PreparedStatement pstmt2 = conn.prepareStatement(sql2);  
-	            	 pstmt2.setInt(1,  res.getInt(1)-1);
-	 	            pstmt2.setInt(2, id);  
-	 	              pstmt2.executeUpdate();
-	 	             res =  pstmt.executeQuery();
-	 	            resultStr = "Remaining";
-	 	            return  res;
-	            }else  if(!res.next() ) {
-	            	resultStr = "Not Found";
-	            	return res;
-	            }else{
-	            	System.out.println("Sold out");
-	            	resultStr = "Sold Out";
-	            	return res;
-	            }
-	        } catch (SQLException e) {  
-	        	
-	            System.out.println(e.getMessage());  
-	        }
-	        resultStr = "Not Found";
-			return null;  
-	    } 
-	 
-	 public static String resultStr = "";
-	 
+     //Method to convert ResultSet to JSONArray (Also Add resultStr to the Array)
 	 public static JSONArray convert(ResultSet resultSet) throws Exception {
 
 		 
@@ -114,12 +69,12 @@ public class OrderMain   {
 		}
 	
 	 
-	 
+	 //Method to Insert a new record into the order database when the purchase is Success
 	 public  void orderUpdate(int id) throws NumberFormatException, JSONException, Exception {  
-		 String sql = "INSERT INTO orders(id, Time) VALUES(?,?)";   
+		 String sql = "INSERT INTO orders(id, Time) VALUES(?,?)";   //sql query
 		 PreparedStatement pstmt= conn.prepareStatement(sql);  
     	 pstmt.setInt(1, id);
-    	 Timestamp p = new java.sql.Timestamp(new java.util.Date().getTime());
+    	 Timestamp p = new java.sql.Timestamp(new java.util.Date().getTime()); //create new timestamp 
     	 System.out.println(p.toString());
     	 pstmt.setString(2,p.toString());
          pstmt.executeUpdate();
@@ -127,31 +82,33 @@ public class OrderMain   {
 	   
 	 }
 	 
-	 public static String catalogIP_Port = "192.168.1.107:8077";
+	 public static String catalogIP_Port = "192.168.1.107:8077"; // ip and port for  catalog microservice
 	 
 	 public static void main(String[] args) {
 		
-		 OrderMain app = new OrderMain();
+		 OrderMain app = new OrderMain(); //create an instance of the class
 		
 		 
 		 
 		 
 
-		 port(8088);
+		 port(8088); //start the microservice at port 8088
 		 
 
 		 
-		 
+		//when it receive a post http request for an id it checks if there is in the stock 
+		// and make the purchase also add the record (id,timestamp) to the order database 
 		 post("/purchase/:id", (req,res) -> {
 			
 			 res.type("application/json");
 			 
-			  URL url = new URL("http://"+catalogIP_Port+"/purchase/" + req.params(":id").replaceAll(" ", "%20"));
+			 //send a get method to catalog database to see the remaining quantity from this book
+			  URL url = new URL("http://"+catalogIP_Port+"/purchase/" + req.params(":id").replaceAll(" ", "%20")); 
 
 			 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			 con.setRequestMethod("GET");
 			 
-			 int status = con.getResponseCode();
+			 //read the respond
 			 BufferedReader in = new BufferedReader(
 			 new InputStreamReader(con.getInputStream()));
 			 String inputLine;
@@ -160,15 +117,17 @@ public class OrderMain   {
 		     content.append(inputLine);
 			 }
 			 in.close();
-			 System.out.println(content);
+			 System.out.println(content); 
 			 
-			 if(content.toString().equals("-1")) {
+			 //return not found or sold out if it is correct 
+			 if(content.toString().equals("-1")) { 
 				 return new Gson().toJson("Not Found");
 			
 			 }else if (content.toString().equals("0")) {
 				 return new Gson().toJson("Sold Out");
-			 }else {
+			 }else { //if it is found and not sold out continue
 				
+				 //send a put method to catalog database to update the remaining quantity from this book (quantity -1)
 				 URL url2 = new URL("http://"+catalogIP_Port+"/purchase/" + req.params(":id").replaceAll(" ", "%20"));
 					
 				 con = (HttpURLConnection) url2.openConnection();
@@ -176,7 +135,7 @@ public class OrderMain   {
 				 con.setRequestMethod("PUT");
 				 
 				
-				 
+				 // put in the message (quantity -1)
 				 OutputStreamWriter out = new OutputStreamWriter(
 						    con.getOutputStream());
 				        int w = Integer.parseInt(content.toString());
@@ -184,6 +143,7 @@ public class OrderMain   {
 						out.write("" + (w-1));
 						out.close();
 						
+				 //read the response
 				 BufferedReader in2 = new BufferedReader(
 						  new InputStreamReader(con.getInputStream()));
 						String inputLine2;
@@ -193,6 +153,8 @@ public class OrderMain   {
 						}
 						in2.close();
 						System.out.println(content2);
+						
+						//finally update the order database by inserting a new record (id,timestamp)
 						app.orderUpdate(Integer.parseInt(req.params(":id")));
 						 return content2;
 			 }
