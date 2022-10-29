@@ -20,6 +20,8 @@ public class CatalogMain   {
 	        // SQLite connection string to the catalog database 
 		 	String url = "jdbc:sqlite:catalogdb";  
 	        Connection conn = null;  
+	     // try to connect the catalog database using the URL above 
+	        // if success, it print the connection success 
 	        try {  
 	            conn = DriverManager.getConnection(url); 
 	            System.out.printf("COnnect Success");

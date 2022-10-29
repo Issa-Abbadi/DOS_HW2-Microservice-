@@ -21,10 +21,13 @@ import org.json.JSONObject;
 public class OrderMain   {
 	
 	//Connect to sqlite order database
-	 private  Connection connect() {  
+	 private  Connection connect()
+	 {  
 		// SQLite connection string to the order database 
 		 String url = "jdbc:sqlite:orderdb";  
 	        Connection conn = null;  
+	     // try to connect the catalog database using the URL above 
+	        // if success, it print the connection success 
 	        try {  
 	            conn = DriverManager.getConnection(url); 
 	            System.out.printf("COnnect Success");
@@ -32,7 +35,7 @@ public class OrderMain   {
 	            System.out.println(e.getMessage());  
 	        }  
 	        return conn;  
-	    }  
+	  }  
 	 
 
 	 Connection conn = this.connect(); // create just one connection to the database
