@@ -14,10 +14,12 @@ public class FrontMain   {
 	
 	
 	
-    public static String catalogIP_Port = "192.168.1.107:8077"; // ip and port for  catalog microservice
-    public static String orderIP_Port = "192.168.1.248:8088"; // ip and port for  order microservice
+    public static String catalogIP_Port = "localhost:8077"; // ip and port for  catalog microservice
+    public static String orderIP_Port = "localhost:8088"; // ip and port for  order microservice
 
 	public static void main(String[] args) {
+		
+		Cache<URL,StringBuffer> cache = new Cache<URL,StringBuffer>(5);
 		
 		 port(8084); //start the microservice at localhost at port 8084
 		 
@@ -26,7 +28,13 @@ public class FrontMain   {
 		 //And return the response to the client
 		 get("/search/:topic", (req, res) -> {
 			 res.type("application/json");
+			 
+			
 		     URL url = new URL("http://"+ catalogIP_Port +"/search/"+req.params(":topic").replaceAll(" ", "%20"));
+		     if(cache.get(url) != null) {
+		    	 System.out.println("In cache" + cache.get(url));
+		    	 return cache.get(url);
+		     }
 			 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			 con.setRequestMethod("GET");
 			 
@@ -40,7 +48,7 @@ public class FrontMain   {
 					}
 					in.close();
 					System.out.println(content);
-			   
+			 cache.put(url, content);
 			 return  content;
 		 });
 		 
@@ -50,7 +58,10 @@ public class FrontMain   {
 			 res.type("application/json");
 			   
 			  URL url = new URL("http://"+ catalogIP_Port +"/info/" + req.params(":id").replaceAll(" ", "%20"));
-			
+			    if(cache.get(url) != null) {
+			    	 System.out.println("In cache" + cache.get(url));
+			    	 return cache.get(url);
+			     }
 				 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 				 con.setRequestMethod("GET");
 				 
@@ -64,7 +75,7 @@ public class FrontMain   {
 						}
 						in.close();
 						System.out.println(content);
-				   
+			     cache.put(url, content);
 				 return  content;
 		 });
 		 

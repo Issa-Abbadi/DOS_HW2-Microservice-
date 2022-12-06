@@ -21,13 +21,10 @@ import org.json.JSONObject;
 public class OrderMain   {
 	
 	//Connect to sqlite order database
-	 private  Connection connect()
-	 {  
+	 private  Connection connect() {  
 		// SQLite connection string to the order database 
 		 String url = "jdbc:sqlite:orderdb";  
 	        Connection conn = null;  
-	     // try to connect the catalog database using the URL above 
-	        // if success, it print the connection success 
 	        try {  
 	            conn = DriverManager.getConnection(url); 
 	            System.out.printf("COnnect Success");
@@ -35,7 +32,7 @@ public class OrderMain   {
 	            System.out.println(e.getMessage());  
 	        }  
 	        return conn;  
-	  }  
+	    }  
 	 
 
 	 Connection conn = this.connect(); // create just one connection to the database
@@ -85,7 +82,7 @@ public class OrderMain   {
 	   
 	 }
 	 
-	 public static String catalogIP_Port = "192.168.1.107:8077"; // ip and port for  catalog microservice
+	 public static String catalogIP_Port = "localhost:8077"; // ip and port for  catalog microservice
 	 
 	 public static void main(String[] args) {
 		
