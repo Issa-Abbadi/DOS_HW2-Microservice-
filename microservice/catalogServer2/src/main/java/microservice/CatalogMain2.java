@@ -3,7 +3,6 @@ import static spark.Spark.get;
 import static spark.Spark.put;
 import com.google.gson.Gson;
 import static spark.Spark.port;
-import static spark.Spark.post;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -20,11 +19,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class CatalogMain   {
+public class CatalogMain2   {
 	
-    public static String catalogIP_Port2 = "localhost:8078"; // ip and port for  catalog2 microservice
-
-	
+    public static String catalogIP_Port1 = "localhost:8077"; // ip and port for  catalog microservice
+    
 	//Connect to sqlite catalog database
 	 private  Connection connect() {  
 	        // SQLite connection string to the catalog database 
@@ -171,59 +169,49 @@ public class CatalogMain   {
 	        	
 	            System.out.println(e.getMessage());  
 	        }
-	        
-	     
-				 
+	       
+			return new Gson().toJson("Purchase Successfully  "+ "Remaining = " + quantity);  //return message
+	    } 
+	
+	 public String purchaseFromMain(int id, int quantity)  throws NumberFormatException, JSONException, Exception {
+		 
+		 URL url2 = new URL("http://"+catalogIP_Port1+"/purchase/" + id);
+		 HttpURLConnection con = (HttpURLConnection) url2.openConnection();
 			
+		 con = (HttpURLConnection) url2.openConnection();
+		 con.setDoOutput(true);
+		 con.setRequestMethod("PUT");
+		 
+		
+		 // put in the message (quantity -1)
+		 OutputStreamWriter out = new OutputStreamWriter(
+				    con.getOutputStream());
+		        
+		 
+				out.write("" + quantity);
+				out.close();
 				
+		 //read the response
+		 BufferedReader in2 = new BufferedReader(
+				  new InputStreamReader(con.getInputStream()));
+				String inputLine2;
+				StringBuffer content2 = new StringBuffer();
+				while ((inputLine2 = in2.readLine()) != null) {
+				    content2.append(inputLine2);
+				}
+				in2.close();
+				System.out.println(content2);
 				
-				 
-				
-					
-					 //send a put method to catalog database to update the remaining quantity from this book (quantity -1)
-					 URL url2 = new URL("http://"+catalogIP_Port2+"/purchaseConsistancy/" + id);
-					 HttpURLConnection con = (HttpURLConnection) url2.openConnection();
-						
-					 con = (HttpURLConnection) url2.openConnection();
-					 con.setDoOutput(true);
-					 con.setRequestMethod("PUT");
-					 
-					
-					 // put in the message (quantity -1)
-					 OutputStreamWriter out = new OutputStreamWriter(
-							    con.getOutputStream());
-					        
-					 
-							out.write("" + quantity);
-							out.close();
-							
-					 //read the response
-					 BufferedReader in2 = new BufferedReader(
-							  new InputStreamReader(con.getInputStream()));
-							String inputLine2;
-							StringBuffer content2 = new StringBuffer();
-							while ((inputLine2 = in2.readLine()) != null) {
-							    content2.append(inputLine2);
-							}
-							in2.close();
-							System.out.println(content2);
-							
-						
-				 
-				 
-				
-			 
-
-
-
-			 
 		if(!("").contentEquals(content2)) {
 			return new Gson().toJson("Purchase Successfully  "+ "Remaining = " + quantity);  //return message
 
-		}
-	       
+		} else {
 			return new Gson().toJson("Purchase Error  "+ "Remaining = " + quantity);  //return message
-	    } 
+
+		}
+    
+		
+ } 
 	 
 	 
 	 
@@ -232,13 +220,13 @@ public class CatalogMain   {
 	 
 	public static void main(String[] args) {
 		
-		 CatalogMain app = new CatalogMain(); //create an instance of the class
+		 CatalogMain2 app = new CatalogMain2(); //create an instance of the class
 		
 		 
 		 
 
 
-		 port(8077); //start the microservice at port 8077
+		 port(8078); //start the microservice at port 8077
 		 
 		 
 		 //when it receive a get http request for an topic use search method to search for the books 
@@ -268,6 +256,14 @@ public class CatalogMain   {
 		//when it receive a put http request for an id for purchase use purchase method to 
 		//update the quantity and return the Remaining quantity after the update
 		 put("/purchase/:id", (req,res) -> {
+			 res.type("application/json");
+			 
+		
+			 
+			 return app.purchaseFromMain(Integer.parseInt(req.params(":id")),Integer.parseInt(req.body()));
+		 });
+		 
+		 put("/purchaseConsistancy/:id", (req,res) -> {
 			 res.type("application/json");
 			 
 		

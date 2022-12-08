@@ -19,10 +19,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class OrderMain   {
+public class OrderMain2   {
 	
-	 public static String catalogIP_Port = "localhost:8077"; // ip and port for  catalog microservice
-	 public static String orderIP_Port2 = "localhost:8089"; // ip and port for  catalog microservice
+	 public static String catalogIP_Port = "localhost:8078"; // ip and port for  catalog microservice
+	 public static String orderIP_Port1 = "localhost:8088"; // ip and port for  catalog microservice
+
 	
 	//Connect to sqlite order database
 	 private  Connection connect() {  
@@ -74,37 +75,14 @@ public class OrderMain   {
 	
 	 
 	 //Method to Insert a new record into the order database when the purchase is Success
-	 public String orderUpdate(int id,Timestamp p) throws NumberFormatException, JSONException, Exception {  
+	 public  String orderUpdate(int id,Timestamp p) throws NumberFormatException, JSONException, Exception {  
 		 String sql = "INSERT INTO orders(id, Time) VALUES(?,?)";   //sql query
 		 PreparedStatement pstmt= conn.prepareStatement(sql);  
     	 pstmt.setInt(1, id);
     	 pstmt.setString(2,p.toString());
          pstmt.executeUpdate();
          
-         URL url = new URL("http://"+orderIP_Port2+"/orderUpdate/" + id); 
-
-		 HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		 con.setDoOutput(true);
-		 con.setRequestMethod("PUT");
-		 
-		 OutputStreamWriter out = new OutputStreamWriter(
-				    con.getOutputStream());
-		      
-		
-				out.write(p.toString());
-				out.close();
-		 
-		 //read the respond
-		 BufferedReader in = new BufferedReader(
-		 new InputStreamReader(con.getInputStream()));
-		 String inputLine;
-		 StringBuffer content = new StringBuffer();
-		 while ((inputLine = in.readLine()) != null) {
-	     content.append(inputLine);
-		 }
-		 in.close();
-		 System.out.println(content); 
-		 return content.toString();
+         return "Insert Sccuess";
       
 	   
 	 }
@@ -113,13 +91,13 @@ public class OrderMain   {
 	 
 	 public static void main(String[] args) {
 		
-		 OrderMain app = new OrderMain(); //create an instance of the class
+		 OrderMain2 app = new OrderMain2(); //create an instance of the class
 		
 		 
 		 
 		 
 
-		 port(8088); //start the microservice at port 8088
+		 port(8089); //start the microservice at port 8088
 		 
 
 		 
@@ -181,16 +159,30 @@ public class OrderMain   {
 						in2.close();
 						System.out.println(content2);
 						
-						//finally update the order database by inserting a new record (id,timestamp)
-						 Timestamp p = new java.sql.Timestamp(new java.util.Date().getTime()); //create new timestamp 
-						String replay = app.orderUpdate(Integer.parseInt(req.params(":id")),p);
-						if(!replay.equals("")) {
-							 return content2;
-						} else {
-							return new Gson().toJson("Error happend");
-						}
-					
 						
+						
+						 URL url3 = new URL("http://"+orderIP_Port1+"/orderUpdate/" + req.params(":id").replaceAll(" ", "%20"));
+							
+						 con = (HttpURLConnection) url3.openConnection();
+						 con.setDoOutput(true);
+						 con.setRequestMethod("PUT");
+						 
+						 BufferedReader in3 = new BufferedReader(
+								  new InputStreamReader(con.getInputStream()));
+								String inputLine3;
+								StringBuffer content3 = new StringBuffer();
+								while ((inputLine3 = in3.readLine()) != null) {
+								    content3.append(inputLine3);
+								}
+								in3.close();
+								System.out.println(content3);
+						 
+						
+						
+						if(!("").contentEquals(content3)) {
+							 return content2;
+						}
+						 return new Gson().toJson("ERROR happend");
 			 }
 			 
 		
@@ -201,13 +193,13 @@ public class OrderMain   {
 		 
 		 put("/orderUpdate/:id", (req,res) -> {
 			 res.type("application/json");
-			 Timestamp p = new java.sql.Timestamp(new java.util.Date().getTime()); //create new timestamp 
-			 return app.orderUpdate(Integer.parseInt(req.params(":id")),p);
-
-
-
+			 return app.orderUpdate(Integer.parseInt(req.params(":id")),Timestamp.valueOf(req.body()));
 		 });
-	 }
+		 
+
+
+
+		 }
 
 	
 		

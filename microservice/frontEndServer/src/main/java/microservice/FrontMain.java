@@ -53,7 +53,7 @@ public class FrontMain   {
 			 
 			 res.type("application/json");
 			 
-			 URL cacheUrl = new URL("http://"+"/info/" + req.params(":id").replaceAll(" ", "%20"));
+			 URL cacheUrl = new URL("http://"+"/search/" + req.params(":topic").replaceAll(" ", "%20"));
 		     
 		     if(cache.get(cacheUrl) != null) {
 		    	 System.out.println("In cache" + cache.get(cacheUrl));
