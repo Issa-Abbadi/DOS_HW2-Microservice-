@@ -142,7 +142,11 @@ public class FrontMain   {
 				 }
 				 in.close();
 				 System.out.println(content);
-						
+				 if(content.toString().contains("Remaining")) {
+					 URL cacheUrl = new URL("http://"+"/info/" + req.params(":id").replaceAll(" ", "%20"));
+					 cache.delete(cacheUrl);
+				 }
+				 		
 
 				   
 				 return  content;

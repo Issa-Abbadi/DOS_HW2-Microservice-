@@ -37,30 +37,14 @@ public class Cache<K, V> {
     
     
     CacheItem node = (CacheItem) map.get(key);
-    if(!node.isValid()) {
-    	return null;
-    }
+ 
     node.incrementHitCount();
     reorder(node);
     return (V) node.getValue();
     
     }
     
-    public V setValid(K key) {
-    	
-        if(map.containsKey(key) == false) {
-            return null;
-        }
-        
-        
-        CacheItem node = (CacheItem) map.get(key);
-        if(node.isValid()) {
-        	node.setValid(false);
-        }       
-        return (V) node.getValue();
-        
-        }
-
+   
     public void delete(K key) {
         deleteNode(map.get(key));
     }
@@ -70,6 +54,9 @@ public class Cache<K, V> {
         if(node == null) {
             return;
         }
+        if(first != node && last != node){
+        	node.getPrev().setNext(node.getNext());
+        }
         if(last == node) {
             last = node.getPrev();
         }
@@ -77,9 +64,7 @@ public class Cache<K, V> {
         if(first == node) {
             first = node.getNext();
         } 
-        if(first != node && last != node){
-        	node.getPrev().setNext(node.getNext());
-        }
+       
         map.remove(node.getKey());
         node = null; // Optional, collected by GC
         size--;

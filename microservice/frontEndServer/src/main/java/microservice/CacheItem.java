@@ -5,20 +5,14 @@ public class CacheItem<K, V> {
     private V value;
     private int hitCount = 0; // LFU require this
     private CacheItem prev, next;
-    private boolean valid = true;
+
 
     public CacheItem(K key, V value) {
         this.value = value;
         this.key = key;
     }
     
-    public boolean isValid() {
-		return valid;
-	}
 
-	public void setValid(boolean valid) {
-		this.valid = valid;
-	}
 
 	public void incrementHitCount() {
         this.hitCount++;
