@@ -19,11 +19,11 @@ public class FrontMain   {
 	public static String catalogIP_Port = ""; 
 	public static String orderIP_Port = "";
 	    
-    public static String catalogIP_Port1 = "localhost:8077"; // ip and port for  catalog microservice
-    public static String orderIP_Port1 = "localhost:8088"; // ip and port for  order microservice
+    public static String catalogIP_Port1 = "192.168.249.76:8077"; // ip and port for  catalog microservice
+    public static String orderIP_Port1 = "192.168.249.196:8088"; // ip and port for  order microservice
     
-    public static String catalogIP_Port2 = "localhost:8078"; // ip and port for  catalog2 microservice
-    public static String orderIP_Port2 = "localhost:8089"; // ip and port for  order2 microservice
+    public static String catalogIP_Port2 = "192.168.249.179:8078"; // ip and port for  catalog2 microservice
+    public static String orderIP_Port2 = "192.168.249.242:8089"; // ip and port for  order2 microservice
     public static Queue<String> catalogQueue = new LinkedList<>();
     public static Queue<String> orderQueue = new LinkedList<>();
     

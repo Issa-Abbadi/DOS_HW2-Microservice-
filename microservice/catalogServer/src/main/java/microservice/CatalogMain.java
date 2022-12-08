@@ -22,7 +22,7 @@ import org.json.JSONObject;
 
 public class CatalogMain   {
 	
-    public static String catalogIP_Port2 = "localhost:8078"; // ip and port for  catalog2 microservice
+    public static String catalogIP_Port2 = "192.168.249.179:8078"; // ip and port for  catalog2 microservice
 
 	
 	//Connect to sqlite catalog database
