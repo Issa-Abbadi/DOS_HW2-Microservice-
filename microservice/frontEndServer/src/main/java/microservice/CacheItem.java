@@ -1,23 +1,15 @@
 package microservice;
 
 public class CacheItem<K, V> {
-    private K key;
-    private V value;
-    private int hitCount = 0; // LFU require this
-    private CacheItem prev, next;
+    private K key; //URL
+    private V value; //Responce
+    private CacheItem prev, next; //refrence to the previous and the next nodes
 
 
     public CacheItem(K key, V value) {
         this.value = value;
         this.key = key;
     }
-    
-
-
-	public void incrementHitCount() {
-        this.hitCount++;
-    }
-    // getter / setter
 
 	public CacheItem getPrev() {
 		return prev;

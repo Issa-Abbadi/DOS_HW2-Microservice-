@@ -21,7 +21,7 @@ import org.json.JSONObject;
 
 public class CatalogMain2   {
 	
-    public static String catalogIP_Port1 = "192.168.249.76:8077"; // ip and port for  catalog microservice
+    public static String catalogIP_Port1 = "192.168.249.76:8077"; // ip and port for  catalog1 microservice
     
 	//Connect to sqlite catalog database
 	 private  Connection connect() {  
@@ -263,6 +263,7 @@ public class CatalogMain2   {
 			 return app.purchaseFromMain(Integer.parseInt(req.params(":id")),Integer.parseInt(req.body()));
 		 });
 		 
+		 // to make the db consistant
 		 put("/purchaseConsistancy/:id", (req,res) -> {
 			 res.type("application/json");
 			 

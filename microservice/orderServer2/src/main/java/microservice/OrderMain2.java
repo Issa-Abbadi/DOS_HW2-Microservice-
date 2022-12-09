@@ -21,8 +21,8 @@ import org.json.JSONObject;
 
 public class OrderMain2   {
 	
-	 public static String catalogIP_Port = "192.168.249.179:8078"; // ip and port for  catalog microservice
-	 public static String orderIP_Port1 = "192.168.249.196:8088"; // ip and port for  catalog microservice
+	 public static String catalogIP_Port = "192.168.249.179:8078"; // ip and port for  catalog2 microservice
+	 public static String orderIP_Port1 = "192.168.249.196:8088"; // ip and port for  order1 microservice
 
 	
 	//Connect to sqlite order database
@@ -191,6 +191,7 @@ public class OrderMain2   {
 			
 		 });
 		 
+		 //to make db consistant
 		 put("/orderUpdate/:id", (req,res) -> {
 			 res.type("application/json");
 			 return app.orderUpdate(Integer.parseInt(req.params(":id")),Timestamp.valueOf(req.body()));

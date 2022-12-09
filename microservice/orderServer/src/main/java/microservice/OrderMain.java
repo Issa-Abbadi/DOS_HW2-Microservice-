@@ -21,8 +21,8 @@ import org.json.JSONObject;
 
 public class OrderMain   {
 	
-	 public static String catalogIP_Port = "192.168.249.76:8077"; // ip and port for  catalog microservice
-	 public static String orderIP_Port2 = "192.168.249.242:8089"; // ip and port for  catalog microservice
+	 public static String catalogIP_Port = "192.168.249.76:8077"; // ip and port for  catalog1 microservice
+	 public static String orderIP_Port2 = "192.168.249.242:8089"; // ip and port for  order2 microservice
 	
 	//Connect to sqlite order database
 	 private  Connection connect() {  

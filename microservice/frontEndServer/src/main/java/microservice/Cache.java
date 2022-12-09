@@ -5,30 +5,31 @@ import java.util.Map;
 
 public class Cache<K, V> {
 	
-    private Map<K, CacheItem> map;
-    private CacheItem first, last;
-    private int size;
+    private Map<K, CacheItem> map; //store them in hash map
+    private CacheItem first, last; // to know the first and last nodes
+    private int size; 
     private final int CAPACITY;
-    private int hitCount = 0;
-    private int missCount = 0;
   
     public Cache(int capacity) {
-        CAPACITY = capacity;  // 
+        CAPACITY = capacity;  
         map = new HashMap<>(CAPACITY);
     }
     
+    
+    // to add node to the cache
     public void put(K key, V value) {
     	CacheItem node = new CacheItem(key, value);
 
         if(map.containsKey(key) == false) {
             if(size() >= CAPACITY) {
-                deleteNode(first);
+                deleteNode(first); // delete least recently used node
             }
-            addNodeToLast(node);
+            addNodeToLast(node); // add the new node to the last
         }
         map.put(key, node);
     }
 
+    // get node from cache
     public V get(K key) {
     	
     if(map.containsKey(key) == false) {
@@ -36,15 +37,15 @@ public class Cache<K, V> {
     }
     
     
-    CacheItem node = (CacheItem) map.get(key);
+    CacheItem node = (CacheItem) map.get(key); // get node
  
-    node.incrementHitCount();
+    // reorder the nodes in LRU order
     reorder(node);
     return (V) node.getValue();
     
     }
     
-   
+   //delete node 
     public void delete(K key) {
         deleteNode(map.get(key));
     }
@@ -101,11 +102,5 @@ public class Cache<K, V> {
     public int size() {
         return size;
     }
-    public int getHitCount() {
-        return hitCount;
-    }
 
-    public int getMissCount() {
-        return missCount;
-    }
 }
